@@ -9,9 +9,8 @@ format:
     toc: true
     comments:
       hypothesis: true
-  docx: default
-  jats: default
-  agu-pdf: default
+  pdf: 
+    keep-tex: true
 
 
 

@@ -1,111 +1,175 @@
 ---
-title: La Palma Earthquakes
+title: On direct systems of implications with graded attributes
 author:
-  - name: Steve Purves
-    orcid: 0000-0002-0760-5497
-    corresponding: true
-    email: steve@curvenote.com
+  - name: Manuel Ojeda-Hernández
+    orcid: 0000-0003-4785-6802
+    corresponding: false
+    email: manueloh@cs.umu.se
     roles:
       - Investigation
-      - Project administration
-      - Software
-      - Visualization
+      - Writing
     affiliations:
-      - Curvenote
-  - name: Rowan Cockett
-    orcid: 0000-0002-7859-8394
-    corresponding: false
-    roles: []
+      - Department of Computing Science, Umeå University, Sweden
+  - name: Domingo López-Rodríguez
+    orcid: 0000-0002-0172-1585
+    corresponding: true
+    email: dominlopez@uma.es
+    roles:
+      - Investigation
+      - Writing
     affiliations:
-      - Curvenote
+      - Depto. de Matemática Aplicada, Universidad de Málaga, Spain
 keywords:
-  - La Palma
-  - Earthquakes
+  - Fuzzy attributes
+  - Implicational systems
+  - Directness
 abstract: |
-  In September 2021, a significant jump in seismic activity on the island of La Palma (Canary Islands, Spain) signaled the start of a volcanic crisis that still continues at the time of writing. Earthquake data is continually collected and published by the Instituto Geográphico Nacional (IGN). ...
-plain-language-summary: |
-  Earthquake data for the island of La Palma from the September 2021 eruption is found ...
+  In this paper the problem of defining direct systems of implications in the fuzzy setting is studied. The directness of systems allows a quick computation of the closure operator in cases such as Fuzzy Formal Concept Analysis. Characterizing these properties in algebraic terms is deeply linked to Simplification Logic. After the theoretical results, some thoughts on algorithms to provide direct systems are also considered.
 key-points:
-  - A web scraping script was developed to pull data from the Instituto Geogràphico Nacional into a machine-readable form for analysis
-  - Earthquake events on La Palma are consistent with the presence of both mantle and crustal reservoirs.
+  - A characterization of direct systems of attributes in the fuzzy setting is presented.
+  - This characterization leads to a computational method to construct a direct system of implications given a general implicational system with graded attributes.
 date: last-modified
 bibliography: references.bib
-citation:
-  container-title: Earth and Space Science
-number-sections: true
+number-sections: false
 ---
 
-## Introduction
+<!-- %\newcommand{\el}[2]{^{\scriptsize #2\!\!}/{#1}} -->
+\newcommand{\el}[2]{#1_{#2}}
 
-```{r}
-eruptions <- c(1492, 1585, 1646, 1677, 1712, 1949, 1971, 2021)
-n_eruptions <- length(eruptions)
-```
+# Introduction
 
-```{r}
-#| label: fig-timeline
-#| fig-cap: Timeline of recent earthquakes on La Palma
-#| fig-alt: An event plot of the years of the last 8 eruptions on La Palma.
-#| fig-height: 1.5
-#| fig-width: 6
-par(mar = c(3, 1, 1, 1) + 0.1)
-plot(eruptions, rep(0, n_eruptions), 
-  pch = "|", axes = FALSE)
-axis(1)
-box()
-```
+This document serves as supplementary material for the paper _On direct systems of implications with graded attributes_ submitted to EUSFLAT 2025.
 
-```{r}
-#| output: false
-avg_years_between_eruptions <- mean(diff(eruptions[-n_eruptions]))
-avg_years_between_eruptions
-```
+# Detailed example
 
-Based on data up to and including 1971, eruptions on La Palma happen every `{r} round(avg_years_between_eruptions, 1)` years on average.
+Let us consider a fuzzy formal context $\mathbb K = (G, M, I)$, where the set of attributes is $M=\{a,b,c,d\}$, and such that the valuation lattice, i.e., the lattice $L$ such that $I\in L^{G\times M}$, is $L=\{0, 0.5, 1\}$, equipped with the Lukasiewicz logical structure.
 
-Studies of the magma systems feeding the volcano, such as @marrero2019, have proposed that there are two main magma reservoirs feeding the Cumbre Vieja volcano; one in the mantle (30-40km depth) which charges and in turn feeds a shallower crustal reservoir (10-20km depth).
+Take the system of implications:
 
-Eight eruptions have been recorded since the late 1400s (@fig-timeline).
+$$\Sigma = \{\el{a}{0.5}\,c \to b\,\el{d}{0.5}, \quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d\}$$
 
-Data and methods are discussed in @sec-data-methods.
+We will use the `DirectSystem` algorithm to construct a direct system $\Sigma_d$ equivalent to $\Sigma$.
 
-Let $x$ denote the number of eruptions in a year. Then, $x$ can be modeled by a Poisson distribution
+## Iterations
 
-$$
-p(x) = \frac{e^{-\lambda} \lambda^{x}}{x !}
-$$ {#eq-poisson}
+### Iteration 1
 
-where $\lambda$ is the rate of eruptions per year. Using @eq-poisson, the probability of an eruption in the next $t$ years can be calculated.
+We will describe this iteration in detail, the following ones will be more concise.
 
-| Name                 | Year   |
-| -------------------- | ------ |
-| Current              | 2021   |
-| Teneguía             | 1971   |
-| Nambroque            | 1949   |
-| El Charco            | 1712   |
-| Volcán San Antonio   | 1677   |
-| Volcán San Martin    | 1646   |
-| Tajuya near El Paso  | 1585   |
-| Montaña Quemada      | 1492   |
+**Derived implications**
 
-: Recent historic eruptions on La Palma {#tbl-history}
+The algorithm loops over all pairs of implications, computing the _derived implication_ when needed (required by the fuzzy exchange condition). In this first iteration, only the two implications are checked, for all $\alpha,\beta\in L$ such that the requirements are met:
 
-@tbl-history summarises the eruptions recorded since the colonization of the islands by Europeans in the late 1400s.
+Taking 
+\begin{align*}
+A\to B \quad& = \quad\el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d \\
+C\to D \quad& = \quad\el{a}{0.5}\,c \to b\,\el{d}{0.5},
+\end{align*}
+the execution of `AddDerived` produces:
 
-![Map of La Palma](images/la-palma-map.png){#fig-map}
+- for $\alpha=0.5, \beta=1$, the implication $\el{b}{0.5}\,c \to b\,\el{d}{0.5}$.
 
-La Palma is one of the west most islands in the Volcanic Archipelago of the Canary Islands (@fig-map). 
+Reversing the order in which the implications are considered, i.e., 
+\begin{align*}
+A\to B \quad& =  \quad\el{a}{0.5}\,c \to b\,\el{d}{0.5} \\
+C\to D \quad& = \quad\el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,
+\end{align*}
+`AddDerived` provides:
 
-{{< embed notebooks/explore-earthquakes.qmd#fig-spatial-plot >}}
+- for $\alpha=0.5, \beta=1$: the implication $\el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d$.
+- for $\alpha=1, \beta=1$: the implication $\el{a}{0.5}\,c \to a\,d$.
 
-@fig-spatial-plot shows the location of recent Earthquakes on La Palma.
+This produces
+$$\mathcal D = \{\el{b}{0.5}\,c \to b\,\el{d}{0.5},\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\quad \el{a}{0.5}\,c \to a\,d\}$$
 
-## Data & Methods {#sec-data-methods}
+**Combination phase**
 
-## Conclusion
+The result of applying `Combine` to $\Sigma$ and $\mathcal D$ follows these steps:
 
-## References {.unnumbered}
+- Add the implication $\el{b}{0.5}\,c \to b\,\el{d}{0.5}$ to $\Sigma$, since there is no implication in $\Sigma$ with the same left-hand side.
+- Analogously, add the implication $\el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d$ to $\Sigma$.
+- Update $\el{a}{0.5}\,c \to b\,\el{d}{0.5} \in \Sigma$ with $\el{a}{0.5}\,c \to a\,d\in\mathcal D$, to obtain the implication $\el{a}{0.5}\,c \to a\,b\,d$.
 
-:::{#refs}
+The value of the variable `change` returned by `Combine` is `true` since there have been modifications to $\Sigma$.
 
-:::
+**Result of the iteration**
+
+$\Sigma$ after this iteration:
+$$\Sigma = \{\el{a}{0.5}\,c \to a\,b\,d,\quad\el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\quad\el{b}{0.5}\,c \to b\,\el{d}{0.5},\quad\el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d\}$$
+
+### Iteration 2
+
+Now, we will summarise the steps, for the sake of readability.
+
+**Derived implications**
+
+\begin{align*}
+\mathcal D = & \big\{\el{b}{0.5}\,c \to a\,b\,d,\quad \el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d, \\
+& \quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5}, \quad b \to a\,c\,d,\\
+& \quad c \to b\,\el{d}{0.5},\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d\big\}
+\end{align*}
+
+**Combination phase**
+
+- Update $\el{b}{0.5}\,c \to b\,\el{d}{0.5}\in\Sigma$ with $\el{b}{0.5}\,c \to a\,b\,d\in\mathcal D$ to obtain $\el{b}{0.5}\,c \to a\,b\,d$.
+- Add $\el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5}$,  $\el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d$, $b\,\el{c}{0.5} \to a\,c\,d$, $\el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5}$, $b \to a\,c\,d$ and $c \to b\,\el{d}{0.5}$ to $\Sigma$.
+
+Therefore, the variable `change` is again `true` and a new iteration is needed.
+
+**Result of the iteration**
+
+$\Sigma$ after this iteration:
+\begin{align*}
+\Sigma = & \big\{\el{a}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\\
+& \quad \el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5},\\
+& \quad b \to a\,c\,d,\quad c \to b\,\el{d}{0.5}\big\}.
+\end{align*}
+
+### Iteration 3
+
+**Derived implications**
+
+\begin{align*}
+\mathcal D = & \big\{\el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad  c \to a\,b\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d, \\
+& \quad \el{a}{0.5}\,c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\\
+&\quad b \to a\,c\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d\big\}
+\end{align*}
+
+**Combination phase**
+
+- Update $c \to b\,\el{d}{0.5}\in\Sigma$ with $c \to a\,b\,d$ to obtain $c \to a\,b\,d$.
+
+For this reason, `change` is set to `true`.
+
+**Result of the iteration**
+
+The implication system obtained so far is
+
+\begin{align*}
+\Sigma = & \big\{\el{a}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\\
+&\quad \el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5}, \\
+&\quad b \to a\,c\,d,\quad c \to a\,b\,d\big\}
+\end{align*}
+
+### Iteration 4
+
+**Derived implications**
+
+\begin{align*}
+\mathcal D = & \big\{\el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\\
+&\quad \el{a}{0.5}\,c \to a\,b\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d\big\}
+\end{align*}
+
+**Combination phase**
+
+It can be observed that $\mathcal D \subseteq \Sigma$, thus at this point, `change` is set to `false` and there is no need to iterate further.
+
+## Final result
+
+This is the direct system returned by the algorithm:
+
+\begin{align*}
+\Sigma_d = & \big\{\el{a}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\\
+&\quad \el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5}, \\
+&\quad b \to a\,c\,d,\quad c \to a\,b\,d\big\}
+\end{align*}

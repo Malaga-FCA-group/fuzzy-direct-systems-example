@@ -1,0 +1,275 @@
+---
+title: Code and example
+author: Domingo López-Rodríguez, Manuel Ojeda-Hernández
+---
+
+# Introduction
+
+This is the code and the example in the paper _On direct systems of implications with graded attributes_ submitted to EUSFLAT 2025.
+
+# Prerequisites
+
+We assume knowledge of the `R` programming language. The libraries `digest`, `glue`, and `rlang` should be installed.
+
+# Code
+
+## Auxiliary functions
+
+```{r}
+tnorm <- \(alpha, beta) max(c(0, alpha + beta - 1))
+union <- \(A, B) pmax(A, B)
+setminus <- \(A, B) {A[B >= A] <- 0; return(A)}
+otimes <- \(alpha, A) {sapply(A, \(x) tnorm(alpha, x))}
+
+print_implication <- function(A, B) {
+
+  print_set <- function(A) {
+
+    a <- A[A > 0]
+    v_str <- ifelse(a < 1,
+                    glue::glue(" ({a})"),
+                    "")
+
+    glue::glue("{names(a)}{v_str}") |>
+      stringr::str_flatten_comma()
+
+  }
+
+  a <- print_set(A)
+  b <- print_set(B)
+  glue::glue("{a} -> {b}")
+
+}
+
+# Helps in printing implications for easy reading
+print_all_implications <- function(LHS, RHS) {
+
+  txt <- c()
+  for (i in seq_along(LHS)) {
+
+    txt <- c(txt, print_implication(LHS[[i]], RHS[[i]]))
+
+  }
+
+  return(txt)
+
+}
+```
+
+## `DirectSystem`
+
+```{r}
+direct_system <- function(SigmaLHS, SigmaRHS) {
+  
+  iter <- 0
+  
+  old_pairwise <- matrix(FALSE,
+                         nrow = length(SigmaLHS),
+                         ncol = length(SigmaRHS))
+  colnames(old_pairwise) <- rownames(old_pairwise) <- names(SigmaLHS)
+  
+  repeat {
+    
+    iter <- iter + 1
+    
+    new_pairwise <- matrix(FALSE,
+                           nrow = length(SigmaLHS),
+                           ncol = length(SigmaRHS))
+    colnames(new_pairwise) <- rownames(new_pairwise) <- names(SigmaLHS)
+    
+    new_pairwise[old_pairwise] <- TRUE
+    
+    added <- FALSE
+    
+    newLHS <- newRHS <- list()
+    
+    hashes <- names(SigmaLHS)
+    
+    configs <- expand.grid(hashes, hashes)
+    
+    for (idx in seq(nrow(configs))) {
+      
+      i <- configs[idx, 1]
+      j <- configs[idx, 2]
+      
+      if (i == j) next
+      if (new_pairwise[i, j]) next
+      
+      new_pairwise[i, j] <- TRUE
+      
+      A <- SigmaLHS[[i]]; B <- SigmaRHS[[i]]
+      C <- SigmaLHS[[j]]; D <- SigmaRHS[[j]]
+      
+      Derived <- add_derived(A, B, C, D)
+      
+      Derived <- combine(Derived[[1]], Derived[[2]],
+                         newLHS, newRHS)
+      newLHS <- Derived$lhs
+      newRHS <- Derived$rhs
+      
+    }
+    
+    # optional, simplification of D
+    # cat("*** Simplifying D:\n")
+    # AA <- simplify(newLHS, newRHS)
+    # newLHS <- AA[[1]]
+    # newRHS <- AA[[2]]
+    
+    # Combine:  
+    AA <- combine(newLHS, newRHS,
+                  SigmaLHS, SigmaRHS,
+                  new_pairwise)
+    
+    SigmaLHS <- AA$lhs
+    SigmaRHS <- AA$rhs
+    added <- AA$added
+    
+    old_pairwise <- AA$new_pairwise
+    if (!added) break
+    
+  }
+  
+  return(invisible(list(SigmaLHS, SigmaRHS)))
+  
+}
+```
+
+## `AddDerived`
+
+```{r}
+add_derived <- function(A, B, C, D) {
+  
+  LHS <- RHS <- list()
+  
+  for (alpha in L) {
+    
+    if (alpha == 0) next
+    
+    alphaA <- otimes(alpha, A)
+    alphaB <- otimes(alpha, B)
+    
+    for (beta in L) {
+      
+      if (beta == 0) next
+      
+      cond1 <- setminus(otimes(beta, C), alphaB)
+      cond2 <- setminus(otimes(beta, D), alphaA)
+      
+      if ((sum(cond1) == 0) || (sum(cond2) == 0)) next
+      
+      G <- union(alphaA, cond1)
+      H <- cond2
+      
+      LHS <- append(LHS, list(G))
+      RHS <- append(RHS, list(H))
+      
+    }
+    
+  }
+  
+  return(list(LHS, RHS))
+  
+}
+```
+
+
+## `Combine`
+
+```{r}
+combine <- function(LHS1, RHS1,
+                    SigmaLHS, SigmaRHS,
+                    new_pairwise) {
+  
+  update <- TRUE
+  if (missing(new_pairwise)) update <- FALSE
+  
+  added <- FALSE
+  
+  for (i in seq_along(LHS1)) {
+    
+    hashA <- digest::digest(LHS1[[i]])
+    
+    if (is.null(SigmaLHS[[hashA]])) {
+      
+      added <- TRUE
+      SigmaLHS[[hashA]] <- LHS1[[i]]
+      SigmaRHS[[hashA]] <- RHS1[[i]]
+      
+    } else {
+      
+      # It is already an implication with that LHS
+      if (any(RHS1[[i]] > SigmaRHS[[hashA]])) {
+        
+        # New information
+        added <- TRUE
+        if (update) {
+          
+          new_pairwise[hashA, ] <- FALSE
+          new_pairwise[, hashA] <- FALSE
+          
+        }
+        SigmaRHS[[hashA]] <- union(SigmaRHS[[hashA]], RHS1[[i]])
+        
+      } else {
+        
+        # It was already considered in the system
+        
+      }
+      
+    }
+    
+  }
+  
+  if (update) {
+    
+    return(list(added = added,
+                lhs = SigmaLHS, rhs = SigmaRHS,
+                new_pairwise = new_pairwise))
+    
+  }
+  return(list(added = added,
+              lhs = SigmaLHS, rhs = SigmaRHS))
+  
+}
+```
+
+# Example
+
+```{r}
+# Example in the paper
+L <- c(0, 0.5, 1)
+LHS1 <- c(0.5, 0, 1, 0) |> rlang::set_names(letters[1:4])
+RHS1 <- c(0, 1, 0, 0.5) |> rlang::set_names(letters[1:4])
+LHS2 <- c(0.5, 1, 0, 0.5) |> rlang::set_names(letters[1:4])
+RHS2 <- c(1, 0, 1, 1) |> rlang::set_names(letters[1:4])
+
+LHS <- list(LHS1, LHS2)
+RHS <- list(RHS1, RHS2)
+```
+
+## Initialize $\Sigma$
+
+```{r}
+SigmaLHS <- SigmaRHS <- list()
+Sigma <- combine(LHS, RHS, 
+                 SigmaLHS, SigmaRHS)
+SigmaLHS <- Sigma$lhs
+SigmaRHS <- Sigma$rhs
+```
+
+```{r}
+print_all_implications(SigmaLHS, SigmaRHS)
+```
+
+
+## Perform `DirectSystem`
+
+```{r}
+Sigma_d_LR <- direct_system(SigmaLHS, SigmaRHS)
+Sigma_dLHS <- Sigma_d_LR[[1]]
+Sigma_dRHS <- Sigma_d_LR[[2]]
+```
+
+```{r}
+print_all_implications(Sigma_dLHS, Sigma_dRHS)
+```

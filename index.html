@@ -8,7 +8,7 @@
 
 <meta name="author" content="Manuel Ojeda-Hernández">
 <meta name="author" content="Domingo López-Rodríguez">
-<meta name="dcterms.date" content="2025-01-28">
+<meta name="dcterms.date" content="2025-01-29">
 <meta name="keywords" content="Fuzzy attributes, Implicational systems, Directness">
 
 <title>On direct systems of implications with graded attributes</title>
@@ -81,10 +81,10 @@ window.Quarto = {
 <meta name="citation_keywords" content="Fuzzy attributes,Implicational systems,Directness">
 <meta name="citation_author" content="Manuel Ojeda-Hernández">
 <meta name="citation_author" content="Domingo López-Rodríguez">
-<meta name="citation_publication_date" content="2025-01-28">
-<meta name="citation_cover_date" content="2025-01-28">
+<meta name="citation_publication_date" content="2025-01-29">
+<meta name="citation_cover_date" content="2025-01-29">
 <meta name="citation_year" content="2025">
-<meta name="citation_online_date" content="2025-01-28">
+<meta name="citation_online_date" content="2025-01-29">
 <meta name="citation_language" content="en">
 <meta name="citation_reference" content="citation_title=Strategies for the development of volcanic hazard maps in monogenetic volcanic fields: The example of La Palma (Canary Islands);,citation_author=José Marrero;,citation_author=Alicia García;,citation_author=Manuel Berrocoso;,citation_author=Ángeles Llinares;,citation_author=Antonio Rodríguez-Losada;,citation_author=R. Ortiz;,citation_publication_date=2019-07;,citation_cover_date=2019-07;,citation_year=2019;,citation_doi=10.1186/s13617-019-0085-5;,citation_volume=8;,citation_journal_title=Journal of Applied Volcanology;">
 </head>
@@ -128,7 +128,7 @@ window.Quarto = {
                 <div>
             <div class="quarto-title-meta-heading">Published</div>
             <div class="quarto-title-meta-contents">
-              <p class="date">January 28, 2025</p>
+              <p class="date">January 29, 2025</p>
             </div>
           </div>
           
@@ -192,9 +192,9 @@ window.Quarto = {
 </section>
 <section id="detailed-example" class="level1">
 <h1>Detailed example</h1>
-<p>Let us consider a fuzzy formal context <span class="math inline">\(\mathbb K = (G, M, I)\)</span>, where the set of attributes is <span class="math inline">\(M=\{a,b,c,d\}\)</span>, and such that the valuation lattice, i.e., the lattice <span class="math inline">\(L\)</span> such that <span class="math inline">\(I\in L^{G\times M}\)</span>, is <span class="math inline">\(L=\{0, 0.5, 1\}\)</span>, equipped with the Lukasiewicz logical structure.</p>
+<p>Let us consider a fuzzy formal context <span class="math inline">\(\mathbb K = (G, M, I)\)</span>, where the set of attributes is <span class="math inline">\(M=\{a,b,c,d,e\}\)</span>, and such that the valuation lattice, i.e., the lattice <span class="math inline">\(L\)</span> such that <span class="math inline">\(I\in L^{G\times M}\)</span>, is <span class="math inline">\(L=\{0, 0.5, 1\}\)</span>, equipped with the Lukasiewicz logical structure. If the degree of element <span class="math inline">\(x\in M\)</span> in a set is <span class="math inline">\(y\in L\)</span>, we will denote the element as <span class="math inline">\(x_{y}\)</span>.</p>
 <p>Take the system of implications:</p>
-<p><span class="math display">\[\Sigma = \{a_{0.5}\,c \to b\,d_{0.5}, \quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d\}\]</span></p>
+<p><span class="math display">\[\Sigma = \{a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e, \quad a_{0.5}\,d\,e \to a\,b\,c_{0.5}\}\]</span></p>
 <p>We will use the <code>DirectSystem</code> algorithm to construct a direct system <span class="math inline">\(\Sigma_d\)</span> equivalent to <span class="math inline">\(\Sigma\)</span>.</p>
 <section id="iterations" class="level2">
 <h2 class="anchored" data-anchor-id="iterations">Iterations</h2>
@@ -204,81 +204,108 @@ window.Quarto = {
 <p><strong>Derived implications</strong></p>
 <p>The algorithm loops over all pairs of implications, computing the <em>derived implication</em> when needed (required by the fuzzy exchange condition). In this first iteration, only the two implications are checked, for all <span class="math inline">\(\alpha,\beta\in L\)</span> such that the requirements are met:</p>
 <p>Taking <span class="math display">\[\begin{align*}
-A\to B \quad&amp; = \quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d \\
-C\to D \quad&amp; = \quad a_{0.5}\,c \to b\,d_{0.5},
+A\to B \quad&amp; = \quad a_{0.5}\,d\,e \to a\,b\,c_{0.5} \\
+C\to D \quad&amp; = \quad a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,
 \end{align*}\]</span> the execution of <code>AddDerived</code> produces:</p>
 <ul>
-<li>for <span class="math inline">\(\alpha=0.5, \beta=1\)</span>, the implication <span class="math inline">\(b_{0.5}\,c \to b\,d_{0.5}\)</span>.</li>
+<li>for <span class="math inline">\(\alpha = 0.5\)</span>, <span class="math inline">\(\beta = 0.5\)</span>, the implication <span class="math inline">\(d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\)</span>.</li>
+<li>for <span class="math inline">\(\alpha = 1\)</span>, <span class="math inline">\(\beta = 0.5\)</span>, the implication <span class="math inline">\(a_{0.5}\,d\,e \to b_{0.5}\,c_{0.5}\)</span>.</li>
+<li>for <span class="math inline">\(\alpha = 1\)</span>, <span class="math inline">\(\beta = 1\)</span>, the implication <span class="math inline">\(a_{0.5}\,d\,e \to a\,b\,c\)</span>.</li>
 </ul>
 <p>Reversing the order in which the implications are considered, i.e., <span class="math display">\[\begin{align*}
-A\to B \quad&amp; =  \quad a_{0.5}\,c \to b\,d_{0.5} \\
-C\to D \quad&amp; = \quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,
+A\to B \quad&amp; =  \quad a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e \\
+C\to D \quad&amp; = \quad a_{0.5}\,d\,e \to a\,b\,c_{0.5},
 \end{align*}\]</span> <code>AddDerived</code> provides:</p>
 <ul>
-<li>for <span class="math inline">\(\alpha=0.5, \beta=1\)</span>: the implication <span class="math inline">\(a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d\)</span>.</li>
-<li>for <span class="math inline">\(\alpha=1, \beta=1\)</span>: the implication <span class="math inline">\(a_{0.5}\,c \to a\,d\)</span>.</li>
+<li>for <span class="math inline">\(\alpha = 0.5\)</span>, <span class="math inline">\(\beta = 0.5\)</span>, the implication <span class="math inline">\(d_{0.5} \to a_{0.5}\,b_{0.5}\)</span>.</li>
+<li>for <span class="math inline">\(\alpha = 0.5\)</span>, <span class="math inline">\(\beta = 1\)</span>, the implication <span class="math inline">\(d\,e \to a\,b\,c_{0.5}\)</span></li>
+<li>for <span class="math inline">\(\alpha = 1\)</span>, <span class="math inline">\(\beta = 1\)</span>, the implication <span class="math inline">\(a_{0.5}\,b_{0.5}\,d \to a\,b\,c_{0.5}\)</span></li>
 </ul>
-<p>This produces <span class="math display">\[\mathcal D = \{b_{0.5}\,c \to b\,d_{0.5},\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\quad a_{0.5}\,c \to a\,d\}\]</span></p>
+<p>This produces <span class="math display">\[\begin{align*}
+\mathcal D &amp;= \big\{d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad a_{0.5}\,d\,e \to a\,b\,c,\quad d_{0.5} \to a_{0.5}\,b_{0.5},\\
+&amp; \quad d\,e \to a\,b\,c_{0.5},\quad a_{0.5}\,b_{0.5}\,d \to a\,b\,c_{0.5}\big\}
+\end{align*}\]</span></p>
 <p><strong>Combination phase</strong></p>
 <p>The result of applying <code>Combine</code> to <span class="math inline">\(\Sigma\)</span> and <span class="math inline">\(\mathcal D\)</span> follows these steps:</p>
 <ul>
-<li>Add the implication <span class="math inline">\(b_{0.5}\,c \to b\,d_{0.5}\)</span> to <span class="math inline">\(\Sigma\)</span>, since there is no implication in <span class="math inline">\(\Sigma\)</span> with the same left-hand side.</li>
-<li>Analogously, add the implication <span class="math inline">\(a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d\)</span> to <span class="math inline">\(\Sigma\)</span>.</li>
-<li>Update <span class="math inline">\(a_{0.5}\,c \to b\,d_{0.5} \in \Sigma\)</span> with <span class="math inline">\(a_{0.5}\,c \to a\,d\in\mathcal D\)</span>, to obtain the implication <span class="math inline">\(a_{0.5}\,c \to a\,b\,d\)</span>.</li>
+<li>Add the implication <span class="math inline">\(d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\)</span> to <span class="math inline">\(\Sigma\)</span>, since there is no implication in <span class="math inline">\(\Sigma\)</span> with the same left-hand side.</li>
+<li>Analogously, add the implications <span class="math inline">\(d_{0.5} \to a_{0.5}\,b_{0.5}\)</span> and <span class="math inline">\(d\,e \to a\,b\,c_{0.5}\)</span> to <span class="math inline">\(\Sigma\)</span>.</li>
+<li>Update <span class="math inline">\(a_{0.5}\,d\,e \to a\,b\,c_{0.5} \in \Sigma\)</span> with <span class="math inline">\(a_{0.5}\,d\,e \to a\,b\,c\in\mathcal D\)</span>, to obtain the implication <span class="math inline">\(a_{0.5}\,d\,e \to a\,b\,c\)</span>.</li>
 </ul>
 <p>The value of the variable <code>change</code> returned by <code>Combine</code> is <code>true</code> since there have been modifications to <span class="math inline">\(\Sigma\)</span>.</p>
 <p><strong>Result of the iteration</strong></p>
-<p><span class="math inline">\(\Sigma\)</span> after this iteration: <span class="math display">\[\Sigma = \{a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\quad b_{0.5}\,c \to b\,d_{0.5},\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d\}\]</span></p>
+<p><span class="math inline">\(\Sigma\)</span> after this iteration: <span class="math display">\[\begin{align*}
+\Sigma &amp; = \big\{a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,\quad a_{0.5}\,d\,e \to a\,b\,c,\quad d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\\
+&amp; \quad d_{0.5} \to a_{0.5}\,b_{0.5},\quad d\,e \to a\,b\,c_{0.5}\big\}
+\end{align*}\]</span></p>
 </section>
 <section id="iteration-2" class="level3">
 <h3 class="anchored" data-anchor-id="iteration-2">Iteration 2</h3>
 <p>Now, we will summarise the steps, for the sake of readability.</p>
 <p><strong>Derived implications</strong></p>
 <p><span class="math display">\[\begin{align*}
-\mathcal D = &amp; \big\{b_{0.5}\,c \to a\,b\,d,\quad c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d, \\
-&amp; \quad b\,c_{0.5} \to a\,c\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5}, \quad b \to a\,c\,d,\\
-&amp; \quad c \to b\,d_{0.5},\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d\big\}
+\mathcal D = &amp; \big\{d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad d\,e_{0.5} \to a\,b\,c\,e,\quad a_{0.5}\,d\,e \to a\,b\,c, \\
+&amp; \quad b\,c_{0.5} \to a\,c\,d,\quad d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\quad d\,e \to a\,b\,c, \quad a_{0.5}\,b_{0.5}\,d \to a\,b\,c\big\}
 \end{align*}\]</span></p>
 <p><strong>Combination phase</strong></p>
 <ul>
-<li>Update <span class="math inline">\(b_{0.5}\,c \to b\,d_{0.5}\in\Sigma\)</span> with <span class="math inline">\(b_{0.5}\,c \to a\,b\,d\in\mathcal D\)</span> to obtain <span class="math inline">\(b_{0.5}\,c \to a\,b\,d\)</span>.</li>
-<li>Add <span class="math inline">\(c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5}\)</span>, <span class="math inline">\(a_{0.5}\,b_{0.5}\,c \to a\,b\,d\)</span>, <span class="math inline">\(b\,c_{0.5} \to a\,c\,d\)</span>, <span class="math inline">\(b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5}\)</span>, <span class="math inline">\(b \to a\,c\,d\)</span> and <span class="math inline">\(c \to b\,d_{0.5}\)</span> to <span class="math inline">\(\Sigma\)</span>.</li>
+<li>Update <span class="math inline">\(d_{0.5} \to a_{0.5}\,b_{0.5}\)</span> with <span class="math inline">\(d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5}\)</span> to obtain <span class="math inline">\(d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5}\)</span>.</li>
+<li>Update <span class="math inline">\(d\,e \to a\,b\,c_{0.5}\)</span> with <span class="math inline">\(d\,e \to a\,b\,c\)</span> to obtain <span class="math inline">\(d\,e \to a\,b\,c\)</span>.</li>
+<li>Add <span class="math inline">\(d\,e_{0.5} \to a\,b\,c\,e\)</span> to <span class="math inline">\(\Sigma\)</span>.</li>
 </ul>
 <p>Therefore, the variable <code>change</code> is again <code>true</code> and a new iteration is needed.</p>
 <p><strong>Result of the iteration</strong></p>
 <p><span class="math inline">\(\Sigma\)</span> after this iteration: <span class="math display">\[\begin{align*}
-\Sigma = &amp; \big\{a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\\
-&amp; \quad c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5},\\
-&amp; \quad b \to a\,c\,d,\quad c \to b\,d_{0.5}\big\}.
+\Sigma = &amp; \big\{a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,\quad
+a_{0.5}\,d\,e \to a\,b\,c,\quad
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\\
+&amp; \quad d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\quad d\,e \to a\,b\,c,\quad d\,e_{0.5} \to a\,b\,c\,e\big\}.
 \end{align*}\]</span></p>
 </section>
 <section id="iteration-3" class="level3">
 <h3 class="anchored" data-anchor-id="iteration-3">Iteration 3</h3>
 <p><strong>Derived implications</strong></p>
 <p><span class="math display">\[\begin{align*}
-\mathcal D = &amp; \big\{c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad  c \to a\,b\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d, \\
-&amp; \quad a_{0.5}\,c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5},\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\\
-&amp;\quad b \to a\,c\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d\big\}
+\mathcal D = &amp; \big\{
+d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\quad  
+d \to a\,b\,c\,e,\quad
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad
+d\,e_{0.5} \to a\,b\,c\,e, \\
+&amp; \quad d\,e \to a\,b\,c,\quad
+a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e_{0.5},\quad
+a_{0.5}\,d\,e \to a\,b\,c\big\}
 \end{align*}\]</span></p>
 <p><strong>Combination phase</strong></p>
 <ul>
-<li>Update <span class="math inline">\(c \to b\,d_{0.5}\in\Sigma\)</span> with <span class="math inline">\(c \to a\,b\,d\)</span> to obtain <span class="math inline">\(c \to a\,b\,d\)</span>.</li>
+<li>Add <span class="math inline">\(d \to a\,b\,c\,e\)</span> to <span class="math inline">\(\Sigma\)</span>.</li>
 </ul>
 <p>For this reason, <code>change</code> is set to <code>true</code>.</p>
 <p><strong>Result of the iteration</strong></p>
 <p>The implication system obtained so far is</p>
 <p><span class="math display">\[\begin{align*}
-\Sigma = &amp; \big\{a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\\
-&amp;\quad c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5}, \\
-&amp;\quad b \to a\,c\,d,\quad c \to a\,b\,d\big\}
+\Sigma = &amp; \big\{
+a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,\quad
+a_{0.5}\,d\,e \to a\,b\,c,\quad
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad
+d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\\
+&amp;\quad
+d\,e \to a\,b\,c,\quad
+d\,e_{0.5} \to a\,b\,c\,e,\quad
+d \to a\,b\,c\,e\big\}
 \end{align*}\]</span></p>
 </section>
 <section id="iteration-4" class="level3">
 <h3 class="anchored" data-anchor-id="iteration-4">Iteration 4</h3>
 <p><strong>Derived implications</strong></p>
 <p><span class="math display">\[\begin{align*}
-\mathcal D = &amp; \big\{c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\\
-&amp;\quad a_{0.5}\,c \to a\,b\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d\big\}
+\mathcal D = &amp; \big\{
+d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\quad
+a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e_{0.5},\quad
+d\,e \to a\,b\,c,\\
+&amp;\quad
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad
+d\,e_{0.5} \to a\,b\,c\,e,\quad
+a_{0.5}\,d\,e \to a\,b\,c\big\}
 \end{align*}\]</span></p>
 <p><strong>Combination phase</strong></p>
 <p>It can be observed that <span class="math inline">\(\mathcal D \subseteq \Sigma\)</span>, thus at this point, <code>change</code> is set to <code>false</code> and there is no need to iterate further.</p>
@@ -288,9 +315,15 @@ C\to D \quad&amp; = \quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,
 <h2 class="anchored" data-anchor-id="final-result">Final result</h2>
 <p>This is the direct system returned by the algorithm:</p>
 <p><span class="math display">\[\begin{align*}
-\Sigma_d = &amp; \big\{a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\\
-&amp;\quad c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5}, \\
-&amp;\quad b \to a\,c\,d,\quad c \to a\,b\,d\big\}
+\Sigma_d = &amp; \big\{
+a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,\quad
+a_{0.5}\,d\,e \to a\,b\,c,\quad
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad
+d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\\
+&amp;\quad
+d\,e \to a\,b\,c,\quad
+d\,e_{0.5} \to a\,b\,c\,e,\quad
+d \to a\,b\,c\,e\big\}
 \end{align*}\]</span></p>
 </section>
 </section>

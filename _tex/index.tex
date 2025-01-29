@@ -155,7 +155,7 @@
 
 \title{On direct systems of implications with graded attributes}
 \author{Manuel Ojeda-Hernández \and Domingo López-Rodríguez}
-\date{2025-01-28}
+\date{2025-01-29}
 
 \begin{document}
 \maketitle
@@ -181,13 +181,15 @@ EUSFLAT 2025.
 \section{Detailed example}\label{detailed-example}
 
 Let us consider a fuzzy formal context \(\mathbb K = (G, M, I)\), where
-the set of attributes is \(M=\{a,b,c,d\}\), and such that the valuation
-lattice, i.e., the lattice \(L\) such that \(I\in L^{G\times M}\), is
-\(L=\{0, 0.5, 1\}\), equipped with the Lukasiewicz logical structure.
+the set of attributes is \(M=\{a,b,c,d,e\}\), and such that the
+valuation lattice, i.e., the lattice \(L\) such that
+\(I\in L^{G\times M}\), is \(L=\{0, 0.5, 1\}\), equipped with the
+Lukasiewicz logical structure. If the degree of element \(x\in M\) in a
+set is \(y\in L\), we will denote the element as \(x_{y}\).
 
 Take the system of implications:
 
-\[\Sigma = \{a_{0.5}\,c \to b\,d_{0.5}, \quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d\}\]
+\[\Sigma = \{a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e, \quad a_{0.5}\,d\,e \to a\,b\,c_{0.5}\}\]
 
 We will use the \texttt{DirectSystem} algorithm to construct a direct
 system \(\Sigma_d\) equivalent to \(\Sigma\).
@@ -208,34 +210,46 @@ checked, for all \(\alpha,\beta\in L\) such that the requirements are
 met:
 
 Taking \begin{align*}
-A\to B \quad& = \quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d \\
-C\to D \quad& = \quad a_{0.5}\,c \to b\,d_{0.5},
+A\to B \quad& = \quad a_{0.5}\,d\,e \to a\,b\,c_{0.5} \\
+C\to D \quad& = \quad a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,
 \end{align*} the execution of \texttt{AddDerived} produces:
 
 \begin{itemize}
 \tightlist
 \item
-  for \(\alpha=0.5, \beta=1\), the implication
-  \(b_{0.5}\,c \to b\,d_{0.5}\).
+  for \(\alpha = 0.5\), \(\beta = 0.5\), the implication
+  \(d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\).
+\item
+  for \(\alpha = 1\), \(\beta = 0.5\), the implication
+  \(a_{0.5}\,d\,e \to b_{0.5}\,c_{0.5}\).
+\item
+  for \(\alpha = 1\), \(\beta = 1\), the implication
+  \(a_{0.5}\,d\,e \to a\,b\,c\).
 \end{itemize}
 
 Reversing the order in which the implications are considered, i.e.,
 \begin{align*}
-A\to B \quad& =  \quad a_{0.5}\,c \to b\,d_{0.5} \\
-C\to D \quad& = \quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,
+A\to B \quad& =  \quad a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e \\
+C\to D \quad& = \quad a_{0.5}\,d\,e \to a\,b\,c_{0.5},
 \end{align*} \texttt{AddDerived} provides:
 
 \begin{itemize}
 \tightlist
 \item
-  for \(\alpha=0.5, \beta=1\): the implication
-  \(a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d\).
+  for \(\alpha = 0.5\), \(\beta = 0.5\), the implication
+  \(d_{0.5} \to a_{0.5}\,b_{0.5}\).
 \item
-  for \(\alpha=1, \beta=1\): the implication \(a_{0.5}\,c \to a\,d\).
+  for \(\alpha = 0.5\), \(\beta = 1\), the implication
+  \(d\,e \to a\,b\,c_{0.5}\)
+\item
+  for \(\alpha = 1\), \(\beta = 1\), the implication
+  \(a_{0.5}\,b_{0.5}\,d \to a\,b\,c_{0.5}\)
 \end{itemize}
 
-This produces
-\[\mathcal D = \{b_{0.5}\,c \to b\,d_{0.5},\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\quad a_{0.5}\,c \to a\,d\}\]
+This produces \begin{align*}
+\mathcal D &= \big\{d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad a_{0.5}\,d\,e \to a\,b\,c,\quad d_{0.5} \to a_{0.5}\,b_{0.5},\\
+& \quad d\,e \to a\,b\,c_{0.5},\quad a_{0.5}\,b_{0.5}\,d \to a\,b\,c_{0.5}\big\}
+\end{align*}
 
 \textbf{Combination phase}
 
@@ -245,15 +259,16 @@ follows these steps:
 \begin{itemize}
 \tightlist
 \item
-  Add the implication \(b_{0.5}\,c \to b\,d_{0.5}\) to \(\Sigma\), since
-  there is no implication in \(\Sigma\) with the same left-hand side.
+  Add the implication \(d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\)
+  to \(\Sigma\), since there is no implication in \(\Sigma\) with the
+  same left-hand side.
 \item
-  Analogously, add the implication
-  \(a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d\) to \(\Sigma\).
+  Analogously, add the implications \(d_{0.5} \to a_{0.5}\,b_{0.5}\) and
+  \(d\,e \to a\,b\,c_{0.5}\) to \(\Sigma\).
 \item
-  Update \(a_{0.5}\,c \to b\,d_{0.5} \in \Sigma\) with
-  \(a_{0.5}\,c \to a\,d\in\mathcal D\), to obtain the implication
-  \(a_{0.5}\,c \to a\,b\,d\).
+  Update \(a_{0.5}\,d\,e \to a\,b\,c_{0.5} \in \Sigma\) with
+  \(a_{0.5}\,d\,e \to a\,b\,c\in\mathcal D\), to obtain the implication
+  \(a_{0.5}\,d\,e \to a\,b\,c\).
 \end{itemize}
 
 The value of the variable \texttt{change} returned by \texttt{Combine}
@@ -261,8 +276,10 @@ is \texttt{true} since there have been modifications to \(\Sigma\).
 
 \textbf{Result of the iteration}
 
-\(\Sigma\) after this iteration:
-\[\Sigma = \{a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\quad b_{0.5}\,c \to b\,d_{0.5},\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d\}\]
+\(\Sigma\) after this iteration: \begin{align*}
+\Sigma & = \big\{a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,\quad a_{0.5}\,d\,e \to a\,b\,c,\quad d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\\
+& \quad d_{0.5} \to a_{0.5}\,b_{0.5},\quad d\,e \to a\,b\,c_{0.5}\big\}
+\end{align*}
 
 \subsubsection{Iteration 2}\label{iteration-2}
 
@@ -271,9 +288,8 @@ Now, we will summarise the steps, for the sake of readability.
 \textbf{Derived implications}
 
 \begin{align*}
-\mathcal D = & \big\{b_{0.5}\,c \to a\,b\,d,\quad c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d, \\
-& \quad b\,c_{0.5} \to a\,c\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5}, \quad b \to a\,c\,d,\\
-& \quad c \to b\,d_{0.5},\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d\big\}
+\mathcal D = & \big\{d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad d\,e_{0.5} \to a\,b\,c\,e,\quad a_{0.5}\,d\,e \to a\,b\,c, \\
+& \quad b\,c_{0.5} \to a\,c\,d,\quad d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\quad d\,e \to a\,b\,c, \quad a_{0.5}\,b_{0.5}\,d \to a\,b\,c\big\}
 \end{align*}
 
 \textbf{Combination phase}
@@ -281,14 +297,14 @@ Now, we will summarise the steps, for the sake of readability.
 \begin{itemize}
 \tightlist
 \item
-  Update \(b_{0.5}\,c \to b\,d_{0.5}\in\Sigma\) with
-  \(b_{0.5}\,c \to a\,b\,d\in\mathcal D\) to obtain
-  \(b_{0.5}\,c \to a\,b\,d\).
+  Update \(d_{0.5} \to a_{0.5}\,b_{0.5}\) with
+  \(d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5}\) to obtain
+  \(d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5}\).
 \item
-  Add \(c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5}\),
-  \(a_{0.5}\,b_{0.5}\,c \to a\,b\,d\), \(b\,c_{0.5} \to a\,c\,d\),
-  \(b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5}\), \(b \to a\,c\,d\) and
-  \(c \to b\,d_{0.5}\) to \(\Sigma\).
+  Update \(d\,e \to a\,b\,c_{0.5}\) with \(d\,e \to a\,b\,c\) to obtain
+  \(d\,e \to a\,b\,c\).
+\item
+  Add \(d\,e_{0.5} \to a\,b\,c\,e\) to \(\Sigma\).
 \end{itemize}
 
 Therefore, the variable \texttt{change} is again \texttt{true} and a new
@@ -297,9 +313,10 @@ iteration is needed.
 \textbf{Result of the iteration}
 
 \(\Sigma\) after this iteration: \begin{align*}
-\Sigma = & \big\{a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\\
-& \quad c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5},\\
-& \quad b \to a\,c\,d,\quad c \to b\,d_{0.5}\big\}.
+\Sigma = & \big\{a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,\quad 
+a_{0.5}\,d\,e \to a\,b\,c,\quad 
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\\
+& \quad d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\quad d\,e \to a\,b\,c,\quad d\,e_{0.5} \to a\,b\,c\,e\big\}.
 \end{align*}
 
 \subsubsection{Iteration 3}\label{iteration-3}
@@ -307,9 +324,14 @@ iteration is needed.
 \textbf{Derived implications}
 
 \begin{align*}
-\mathcal D = & \big\{c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad  c \to a\,b\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d, \\
-& \quad a_{0.5}\,c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5},\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\\
-&\quad b \to a\,c\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d\big\}
+\mathcal D = & \big\{
+d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\quad  
+d \to a\,b\,c\,e,\quad 
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad 
+d\,e_{0.5} \to a\,b\,c\,e, \\
+& \quad d\,e \to a\,b\,c,\quad 
+a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e_{0.5},\quad 
+a_{0.5}\,d\,e \to a\,b\,c\big\}
 \end{align*}
 
 \textbf{Combination phase}
@@ -317,8 +339,7 @@ iteration is needed.
 \begin{itemize}
 \tightlist
 \item
-  Update \(c \to b\,d_{0.5}\in\Sigma\) with \(c \to a\,b\,d\) to obtain
-  \(c \to a\,b\,d\).
+  Add \(d \to a\,b\,c\,e\) to \(\Sigma\).
 \end{itemize}
 
 For this reason, \texttt{change} is set to \texttt{true}.
@@ -328,9 +349,15 @@ For this reason, \texttt{change} is set to \texttt{true}.
 The implication system obtained so far is
 
 \begin{align*}
-\Sigma = & \big\{a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\\
-&\quad c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5}, \\
-&\quad b \to a\,c\,d,\quad c \to a\,b\,d\big\}
+\Sigma = & \big\{
+a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,\quad 
+a_{0.5}\,d\,e \to a\,b\,c,\quad 
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad 
+d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\\
+&\quad 
+d\,e \to a\,b\,c,\quad 
+d\,e_{0.5} \to a\,b\,c\,e,\quad 
+d \to a\,b\,c\,e\big\}
 \end{align*}
 
 \subsubsection{Iteration 4}\label{iteration-4}
@@ -338,8 +365,14 @@ The implication system obtained so far is
 \textbf{Derived implications}
 
 \begin{align*}
-\mathcal D = & \big\{c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\\
-&\quad a_{0.5}\,c \to a\,b\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d\big\}
+\mathcal D = & \big\{
+d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\quad 
+a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e_{0.5},\quad 
+d\,e \to a\,b\,c,\\
+&\quad 
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad 
+d\,e_{0.5} \to a\,b\,c\,e,\quad 
+a_{0.5}\,d\,e \to a\,b\,c\big\}
 \end{align*}
 
 \textbf{Combination phase}
@@ -353,9 +386,15 @@ iterate further.
 This is the direct system returned by the algorithm:
 
 \begin{align*}
-\Sigma_d = & \big\{a_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,d_{0.5} \to a\,c\,d,\quad b_{0.5}\,c \to a\,b\,d,\quad a_{0.5}\,b\,c_{0.5}\,d_{0.5} \to a\,c\,d,\\
-&\quad c_{0.5} \to a_{0.5}\,b_{0.5}\,d_{0.5},\quad a_{0.5}\,b_{0.5}\,c \to a\,b\,d,\quad b\,c_{0.5} \to a\,c\,d,\quad b_{0.5} \to a_{0.5}\,c_{0.5}\,d_{0.5}, \\
-&\quad b \to a\,c\,d,\quad c \to a\,b\,d\big\}
+\Sigma_d = & \big\{
+a_{0.5}\,b_{0.5}\,d \to a\,b\,c\,e,\quad 
+a_{0.5}\,d\,e \to a\,b\,c,\quad 
+d_{0.5}\,e_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5},\quad 
+d_{0.5} \to a_{0.5}\,b_{0.5}\,c_{0.5}\,e_{0.5},\\
+&\quad 
+d\,e \to a\,b\,c,\quad 
+d\,e_{0.5} \to a\,b\,c\,e,\quad 
+d \to a\,b\,c\,e\big\}
 \end{align*}
 
 

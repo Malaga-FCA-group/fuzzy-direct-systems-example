@@ -42,11 +42,11 @@ This document serves as supplementary material for the paper _On direct systems 
 
 # Detailed example
 
-Let us consider a fuzzy formal context $\mathbb K = (G, M, I)$, where the set of attributes is $M=\{a,b,c,d\}$, and such that the valuation lattice, i.e., the lattice $L$ such that $I\in L^{G\times M}$, is $L=\{0, 0.5, 1\}$, equipped with the Lukasiewicz logical structure.
+Let us consider a fuzzy formal context $\mathbb K = (G, M, I)$, where the set of attributes is $M=\{a,b,c,d,e\}$, and such that the valuation lattice, i.e., the lattice $L$ such that $I\in L^{G\times M}$, is $L=\{0, 0.5, 1\}$, equipped with the Lukasiewicz logical structure. If the degree of element $x\in M$ in a set is $y\in L$, we will denote the element as $x_{y}$. 
 
 Take the system of implications:
 
-$$\Sigma = \{\el{a}{0.5}\,c \to b\,\el{d}{0.5}, \quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d\}$$
+$$\Sigma = \{\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,e, \quad \el{a}{0.5}\,d\,e \to a\,b\,\el{c}{0.5}\}$$
 
 We will use the `DirectSystem` algorithm to construct a direct system $\Sigma_d$ equivalent to $\Sigma$.
 
@@ -62,40 +62,49 @@ The algorithm loops over all pairs of implications, computing the _derived impli
 
 Taking 
 \begin{align*}
-A\to B \quad& = \quad\el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d \\
-C\to D \quad& = \quad\el{a}{0.5}\,c \to b\,\el{d}{0.5},
+A\to B \quad& = \quad\el{a}{0.5}\,d\,e \to a\,b\,\el{c}{0.5} \\
+C\to D \quad& = \quad\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,e,
 \end{align*}
 the execution of `AddDerived` produces:
 
-- for $\alpha=0.5, \beta=1$, the implication $\el{b}{0.5}\,c \to b\,\el{d}{0.5}$.
+- for $\alpha = 0.5$, $\beta = 0.5$, the implication $\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}$.
+- for $\alpha = 1$, $\beta = 0.5$, the implication $\el{a}{0.5}\,d\,e \to \el{b}{0.5}\,\el{c}{0.5}$.
+- for $\alpha = 1$, $\beta = 1$, the implication $\el{a}{0.5}\,d\,e \to a\,b\,c$.
 
 Reversing the order in which the implications are considered, i.e., 
 \begin{align*}
-A\to B \quad& =  \quad\el{a}{0.5}\,c \to b\,\el{d}{0.5} \\
-C\to D \quad& = \quad\el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,
+A\to B \quad& =  \quad\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,e \\
+C\to D \quad& = \quad\el{a}{0.5}\,d\,e \to a\,b\,\el{c}{0.5},
 \end{align*}
 `AddDerived` provides:
 
-- for $\alpha=0.5, \beta=1$: the implication $\el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d$.
-- for $\alpha=1, \beta=1$: the implication $\el{a}{0.5}\,c \to a\,d$.
+- for $\alpha = 0.5$, $\beta = 0.5$, the implication $\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}$.
+- for $\alpha = 0.5$, $\beta = 1$, the implication $d\,e \to a\,b\,\el{c}{0.5}$
+- for $\alpha = 1$, $\beta = 1$, the implication $\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,\el{c}{0.5}$
 
 This produces
-$$\mathcal D = \{\el{b}{0.5}\,c \to b\,\el{d}{0.5},\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\quad \el{a}{0.5}\,c \to a\,d\}$$
+\begin{align*}
+\mathcal D &= \big\{\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5},\quad \el{a}{0.5}\,d\,e \to a\,b\,c,\quad \el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5},\\
+& \quad d\,e \to a\,b\,\el{c}{0.5},\quad \el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,\el{c}{0.5}\big\}
+\end{align*}
 
 **Combination phase**
 
 The result of applying `Combine` to $\Sigma$ and $\mathcal D$ follows these steps:
 
-- Add the implication $\el{b}{0.5}\,c \to b\,\el{d}{0.5}$ to $\Sigma$, since there is no implication in $\Sigma$ with the same left-hand side.
-- Analogously, add the implication $\el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d$ to $\Sigma$.
-- Update $\el{a}{0.5}\,c \to b\,\el{d}{0.5} \in \Sigma$ with $\el{a}{0.5}\,c \to a\,d\in\mathcal D$, to obtain the implication $\el{a}{0.5}\,c \to a\,b\,d$.
+- Add the implication $\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}$ to $\Sigma$, since there is no implication in $\Sigma$ with the same left-hand side.
+- Analogously, add the implications $\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}$ and $d\,e \to a\,b\,\el{c}{0.5}$ to $\Sigma$.
+- Update $\el{a}{0.5}\,d\,e \to a\,b\,\el{c}{0.5} \in \Sigma$ with $\el{a}{0.5}\,d\,e \to a\,b\,c\in\mathcal D$, to obtain the implication $\el{a}{0.5}\,d\,e \to a\,b\,c$.
 
 The value of the variable `change` returned by `Combine` is `true` since there have been modifications to $\Sigma$.
 
 **Result of the iteration**
 
 $\Sigma$ after this iteration:
-$$\Sigma = \{\el{a}{0.5}\,c \to a\,b\,d,\quad\el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\quad\el{b}{0.5}\,c \to b\,\el{d}{0.5},\quad\el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d\}$$
+\begin{align*}
+\Sigma & = \big\{\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,e,\quad \el{a}{0.5}\,d\,e \to a\,b\,c,\quad \el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5},\\
+& \quad\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5},\quad d\,e \to a\,b\,\el{c}{0.5}\big\}
+\end{align*}
 
 ### Iteration 2
 
@@ -104,15 +113,15 @@ Now, we will summarise the steps, for the sake of readability.
 **Derived implications**
 
 \begin{align*}
-\mathcal D = & \big\{\el{b}{0.5}\,c \to a\,b\,d,\quad \el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d, \\
-& \quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5}, \quad b \to a\,c\,d,\\
-& \quad c \to b\,\el{d}{0.5},\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d\big\}
+\mathcal D = & \big\{\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5},\quad d\,\el{e}{0.5} \to a\,b\,c\,e,\quad \el{a}{0.5}\,d\,e \to a\,b\,c, \\
+& \quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}\,\el{e}{0.5},\quad d\,e \to a\,b\,c, \quad \el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\big\}
 \end{align*}
 
 **Combination phase**
 
-- Update $\el{b}{0.5}\,c \to b\,\el{d}{0.5}\in\Sigma$ with $\el{b}{0.5}\,c \to a\,b\,d\in\mathcal D$ to obtain $\el{b}{0.5}\,c \to a\,b\,d$.
-- Add $\el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5}$,  $\el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d$, $b\,\el{c}{0.5} \to a\,c\,d$, $\el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5}$, $b \to a\,c\,d$ and $c \to b\,\el{d}{0.5}$ to $\Sigma$.
+- Update $\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}$ with $\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}\,\el{e}{0.5}$ to obtain $\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}\,\el{e}{0.5}$.
+- Update $d\,e \to a\,b\,\el{c}{0.5}$ with $d\,e \to a\,b\,c$ to obtain $d\,e \to a\,b\,c$.
+- Add $d\,\el{e}{0.5} \to a\,b\,c\,e$ to $\Sigma$.
 
 Therefore, the variable `change` is again `true` and a new iteration is needed.
 
@@ -120,9 +129,10 @@ Therefore, the variable `change` is again `true` and a new iteration is needed.
 
 $\Sigma$ after this iteration:
 \begin{align*}
-\Sigma = & \big\{\el{a}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\\
-& \quad \el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5},\\
-& \quad b \to a\,c\,d,\quad c \to b\,\el{d}{0.5}\big\}.
+\Sigma = & \big\{\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,e,\quad 
+\el{a}{0.5}\,d\,e \to a\,b\,c,\quad 
+\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5},\\
+& \quad \el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}\,\el{e}{0.5},\quad d\,e \to a\,b\,c,\quad d\,\el{e}{0.5} \to a\,b\,c\,e\big\}.
 \end{align*}
 
 ### Iteration 3
@@ -130,14 +140,19 @@ $\Sigma$ after this iteration:
 **Derived implications**
 
 \begin{align*}
-\mathcal D = & \big\{\el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad  c \to a\,b\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d, \\
-& \quad \el{a}{0.5}\,c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\\
-&\quad b \to a\,c\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d\big\}
+\mathcal D = & \big\{
+\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}\,\el{e}{0.5},\quad  
+d \to a\,b\,c\,e,\quad 
+\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5},\quad 
+d\,\el{e}{0.5} \to a\,b\,c\,e, \\
+& \quad d\,e \to a\,b\,c,\quad 
+\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,\el{e}{0.5},\quad 
+\el{a}{0.5}\,d\,e \to a\,b\,c\big\}
 \end{align*}
 
 **Combination phase**
 
-- Update $c \to b\,\el{d}{0.5}\in\Sigma$ with $c \to a\,b\,d$ to obtain $c \to a\,b\,d$.
+- Add $d \to a\,b\,c\,e$ to $\Sigma$.
 
 For this reason, `change` is set to `true`.
 
@@ -146,9 +161,15 @@ For this reason, `change` is set to `true`.
 The implication system obtained so far is
 
 \begin{align*}
-\Sigma = & \big\{\el{a}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\\
-&\quad \el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5}, \\
-&\quad b \to a\,c\,d,\quad c \to a\,b\,d\big\}
+\Sigma = & \big\{
+\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,e,\quad 
+\el{a}{0.5}\,d\,e \to a\,b\,c,\quad 
+\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5},\quad 
+\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}\,\el{e}{0.5},\\
+&\quad 
+d\,e \to a\,b\,c,\quad 
+d\,\el{e}{0.5} \to a\,b\,c\,e,\quad 
+d \to a\,b\,c\,e\big\}
 \end{align*}
 
 ### Iteration 4
@@ -156,8 +177,14 @@ The implication system obtained so far is
 **Derived implications**
 
 \begin{align*}
-\mathcal D = & \big\{\el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\\
-&\quad \el{a}{0.5}\,c \to a\,b\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d\big\}
+\mathcal D = & \big\{
+\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}\,\el{e}{0.5},\quad 
+\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,\el{e}{0.5},\quad 
+d\,e \to a\,b\,c,\\
+&\quad 
+\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5},\quad 
+d\,\el{e}{0.5} \to a\,b\,c\,e,\quad 
+\el{a}{0.5}\,d\,e \to a\,b\,c\big\}
 \end{align*}
 
 **Combination phase**
@@ -169,7 +196,13 @@ It can be observed that $\mathcal D \subseteq \Sigma$, thus at this point, `chan
 This is the direct system returned by the algorithm:
 
 \begin{align*}
-\Sigma_d = & \big\{\el{a}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{d}{0.5} \to a\,c\,d,\quad \el{b}{0.5}\,c \to a\,b\,d,\quad \el{a}{0.5}\,b\,\el{c}{0.5}\,\el{d}{0.5} \to a\,c\,d,\\
-&\quad \el{c}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{d}{0.5},\quad \el{a}{0.5}\,\el{b}{0.5}\,c \to a\,b\,d,\quad b\,\el{c}{0.5} \to a\,c\,d,\quad \el{b}{0.5} \to \el{a}{0.5}\,\el{c}{0.5}\,\el{d}{0.5}, \\
-&\quad b \to a\,c\,d,\quad c \to a\,b\,d\big\}
+\Sigma_d = & \big\{
+\el{a}{0.5}\,\el{b}{0.5}\,d \to a\,b\,c\,e,\quad 
+\el{a}{0.5}\,d\,e \to a\,b\,c,\quad 
+\el{d}{0.5}\,\el{e}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5},\quad 
+\el{d}{0.5} \to \el{a}{0.5}\,\el{b}{0.5}\,\el{c}{0.5}\,\el{e}{0.5},\\
+&\quad 
+d\,e \to a\,b\,c,\quad 
+d\,\el{e}{0.5} \to a\,b\,c\,e,\quad 
+d \to a\,b\,c\,e\big\}
 \end{align*}
